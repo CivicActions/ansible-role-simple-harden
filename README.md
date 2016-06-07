@@ -1,6 +1,9 @@
 # ansible-role-simple-harden
 
-## WARNING: Not fully tested. Use or apply only to test systems.
+Apply a series of STIG-suggested hardening rules to an instance.
+
+## WARNING: This will make modifications to system configuration files
+Use or apply only to test systems.
 
 ### Role to apply some simple hardening configurations
 
@@ -9,6 +12,10 @@ The [Security Content Automation Protocol (SCAP)](http://scap.nist.gov/) is a U.
 SCAP supports the process of FISMA Compliance, and the [National Vulnerability Database (NVD)](http://nvd.nist.gov/) is the U.S. government content repository for SCAP.
 
 This role applies basic configuration updates for Kernel networking and the Audit, SSH and Firewall daemons to satisfy a number of STIG rules that fail out-of-the-box for Red Hat Enterprise and CentOS GNU/Linux version 7 distributions.
+
+### Test usage
+
+See the [govready ansible role](https://galaxy.ansible.com/CivicActions/govready/).
 
 ### To apply these rules to your server
 

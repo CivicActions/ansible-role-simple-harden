@@ -2,17 +2,17 @@
 
 # Auditd rules and configuration updates
 
-- name: Auditd: Install default /etc/audit/rules.d/centos7-audit.rules
+- name: Auditd - Install default /etc/audit/rules.d/centos7-audit.rules
   copy: src=centos7-audit.rules
         dest=/etc/audit/rules.d/centos7-audit.rules
   when: ansible_distribution == "CentOS"
 
-- name: Auditd: Install default /etc/audit/rules.d/rhel7-audit.rules
+- name: Auditd - Install default /etc/audit/rules.d/rhel7-audit.rules
   copy: src=rhel7-audit.rules
         dest=/etc/audit/rules.d/rhel7-audit.rules
   when: ansible_distribution == "RedHat"
 
-- name: Auditd: Updates to /etc/audit/auditd.conf
+- name: Auditd - Updates to /etc/audit/auditd.conf
   lineinfile: dest=/etc/audit/auditd.conf regexp="^{{ item.name }} " line="{{ item.name }} = {{ item.value }}"
   with_items:
     - { name: 'space_left_action',       value: 'EMAIL' }
@@ -20,7 +20,7 @@
     - { name: 'flush',                   value: 'DATA'  }
   when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
-- name: Auditd: Updates to /etc/audisp/plugins.d/syslog.conf
+- name: Auditd - Updates to /etc/audisp/plugins.d/syslog.conf
   lineinfile: dest=/etc/audisp/plugins.d/syslog.conf regexp="^{{ item.name }} " line="{{ item.name }} = {{ item.value }}"
   with_items:
     - { name: 'active',                   value: 'yes'  }
@@ -28,7 +28,7 @@
 
 ## Kernel/network parameter remediations.
 
-- name: Kernel: Network parameter remediations.
+- name: Kernel - Network parameter remediations.
   sysctl: name="{{ item.name }}" value="{{ item.value }}"
   with_items:
     - { name: 'net.ipv4.tcp_syncookies',                value: '1' }
@@ -42,72 +42,82 @@
     - { name: 'net.ipv4.icmp_echo_ignore_broadcasts',   value: '1' }
   when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
-- name: Kernel: Disable KDump Kernel Crash Analyzer (kdump)
-  service: name=kdump "{{ item }}"
-  with_items:
-    - 'enabled=no'
-    - 'state=stopped'
+- name: Kernel - Disable KDump Kernel Crash Analyzer (disable)
+  service: name=kdump enabled=no
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
+
+- name: Kernel - Disable KDump Kernel Crash Analyzer (stop)
+  service: name=kdump state=stopped
   when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
 ## SSH Daemon remediations
 
-- name: SSH: Make updates in /etc/ssh/sshd_config
+- name: SSH - Make updates in /etc/ssh/sshd_config
   lineinfile: dest=/etc/ssh/sshd_config regexp="^{{ item.name }} " line="{{ item.name }} {{ item.value }}"
   with_items:
-    { name: 'Protocol',                value: '2'          }
-    { name: 'StrictModes',             value: 'yes'        }
-    { name: 'UsePrivilegeSeparation',  value: 'yes'        }
-    { name: 'PermitEmptyPasswords',    value: 'no'         }
-    { name: 'PermitRootLogin',         value: 'no'         }
-    { name: 'HostbasedAuthentication', value: 'no'         }
-    { name: 'Compression',             value: 'delayed'    }
-    { name: 'GSSAPIAuthentication',    value: 'no'         }
-    { name: 'KerberosAuthentication',  value: 'no'         }
-    { name: 'PermitUserEnvironment',   value: 'no'         }
-    { name: 'ClientAliveCountMax',     value: '0'          }
-    { name: 'Banner',                  value: '/etc/issue' }
-    { name: 'ClientAliveInterval',     value: '900'        }
-    { name: 'Ciphers', value: 'aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc' }
-    { name: 'MACs',    value: 'hmac-sha2-512,hmac-sha2-256,hmac-sha1' }
+    - { name: 'Protocol',                value: '2'          }
+    - { name: 'StrictModes',             value: 'yes'        }
+    - { name: 'UsePrivilegeSeparation',  value: 'yes'        }
+    - { name: 'PermitEmptyPasswords',    value: 'no'         }
+    - { name: 'PermitRootLogin',         value: 'no'         }
+    - { name: 'HostbasedAuthentication', value: 'no'         }
+    - { name: 'Compression',             value: 'delayed'    }
+    - { name: 'GSSAPIAuthentication',    value: 'no'         }
+    - { name: 'KerberosAuthentication',  value: 'no'         }
+    - { name: 'PermitUserEnvironment',   value: 'no'         }
+    - { name: 'ClientAliveCountMax',     value: '0'          }
+    - { name: 'Banner',                  value: '/etc/issue' }
+    - { name: 'ClientAliveInterval',     value: '900'        }
+    - { name: 'Ciphers', value: 'aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc' }
+    - { name: 'MACs',    value: 'hmac-sha2-512,hmac-sha2-256,hmac-sha1' }
   when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
-- name: SSH: Move issue to issue.orig
+- name: SSH - Move issue to issue.orig
   command: mv /etc/issue /etc/issue.orig creates=/etc/issue.orig
 
-- name: SSH: Copy issue banner
+- name: SSH - Copy issue banner
   copy: src=issueBanner.txt
         dest=/etc/issue
 
-- name: SSH: Limit the Number of Concurrent Login Sessions Allowed Per User
+- name: SSH - Limit the Number of Concurrent Login Sessions Allowed Per User
   copy: src=maxlogins.txt
         dest=/etc/security/limits.d/50-limit-maxlogins.conf
         seuser=system_u
   when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
-- name: SSH: Set modes of SSH public certificates
-  command: /usr/bin/chmod 0644 /etc/ssh/*.pub
+- name: SSH - Set modes of SSH public certificates (0644 -> pub)
+  file:
+    path: "{{ item }}"
+    mode: 0644
+  with_fileglob:
+    /etc/ssh/*.pub
 
-- name: SSH: Set modes of SSH private keys
-  command: /usr/bin/chmod  600 /etc/ssh/*_key
+- name: SSH - Set modes of SSH public certificates (0600 -> key)
+  file:
+    path: "{{ item }}"
+    mode: 06oo
+  with_fileglob:
+    /etc/ssh/*.key
 
 ## Firewalld configuration.
 
-- name: Firewalld: Enable firewalld.service for all systemd targets
-  service: name=firewalld "{{ item }}"
-  with_items:
-    - 'enabled=yes'
-    - 'state=started'
+- name: Firewalld - Enable firewalld.service for all systemd targets (enable)
+  service: name=firewalld enabled=yes
   when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
-- name: Firewalld: Set Default firewalld Zone for Incoming Packets
+- name: Firewalld - Enable firewalld.service for all systemd targets (start)
+  service: name=firewalld state=started
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
+
+- name: Firewalld - Set Default firewalld Zone for Incoming Packets
   lineinfile: dest=/etc/firewalld/firewalld.conf regexp="^DefaultZone" line="DefaultZone=drop"
 
-- name: Firewalld: drop by default
+- name: Firewalld - Drop by default
   firewalld: state=enabled zone=drop permanent=true
 
-- name: Enable passthrough for needed ports
+- name: Firewalld - Enable passthrough for needed ports
   firewalld: service="{{ item }}" state=enabled zone=drop permanent=true
-   with_items:
+  with_items:
     - ssh
     - http
     - ntp
