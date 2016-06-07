@@ -1,0 +1,3 @@
+# Limit the Number of Concurrent Login Sessions Allowed Per User
+# RMF control AC-10 CCE-27081-9
+* hard maxlogins 10

@@ -1,0 +1,18 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: openprivacy
+  description: Simple hardening script to satisfy some RMF STIG rules
+  company: "CivicActions, Inc."
+  license: "GPL v3"
+  min_ansible_version: 1.9
+  platforms:
+  - name: Red Hat
+    versions:
+    - all
+  - name: CentOS
+    versions:
+    - all
+  galaxy_tags:
+    - security
