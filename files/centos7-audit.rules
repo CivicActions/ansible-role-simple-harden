@@ -90,6 +90,18 @@
 -a always,exit -F path=/usr/sbin/unix_chkpwd -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged
 -a always,exit -F path=/usr/sbin/usernetctl -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged
 
+# CCE-80391-6, CCE-80392-4, CCE-80393-2, CCE-80394-0
+# Record Any Attempts to Run semanage, setsebool, chcon, restorecon
+-a always,exit -F path=/usr/sbin/semanage -F perm=x -F auid>=1000 -F key=privileged-priv_change
+-a always,exit -F path=/usr/sbin/setsebool -F perm=x -F auid>=1000 -F key=privileged-priv_change
+-a always,exit -F path=/usr/sbin/chcon -F perm=x -F auid>=1000 -F key=privileged-priv_change
+-a always,exit -F path=/usr/sbin/restorecon -F perm=x -F auid>=1000 -F key=privileged-priv_change
+
+# CCE-80402-1, CCE-80409-6
+# Ensure auditd Collects Information on the Use of Privileged Commands - sudoedit, pt_chown
+-a always,exit -F path=/usr/bin/sudoedit -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+-a always,exit -F path=/usr/libexec/pt_chown -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
 ## Use of print command (unsuccessful and successful) 
 
 ## Ensure auditd Collects Information on Exporting to Media (successful)
