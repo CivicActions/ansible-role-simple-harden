@@ -69,7 +69,7 @@
     - { name: 'IgnoreUserKnownHosts',    value: 'yes'        }
     - { name: 'RhostsRSAAuthentication', value: 'no'         }
     - { name: 'Banner',                  value: '/etc/issue' }
-    - { name: 'ClientAliveInterval',     value: '900'        }
+    - { name: 'ClientAliveInterval',     value: '600'        }
     - { name: 'Ciphers', value: 'aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc' }
     - { name: 'MACs',    value: 'hmac-sha2-512,hmac-sha2-256,hmac-sha1' }
   when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
