@@ -1,0 +1,36 @@
+---
+
+## Firewalld configuration.
+
+- name: Firewalld - update /etc/sysctl.conf to allow IP forwarding
+  lineinfile: dest=/etc/sysctl.conf regexp="forward" line="net.ipv4.ip_forward=1"
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
+
+- name: Firewalld - apply updates to sysctl
+  command: sysctl -p
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
+
+- name: Firewalld - Enable firewalld.service for all systemd targets (enable)
+  service: name=firewalld enabled=yes
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
+
+- name: Firewalld - Enable firewalld.service for all systemd targets (start)
+  service: name=firewalld state=started
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
+
+- name: Firewalld - Set Default firewalld Zone for Incoming Packets
+  lineinfile: dest=/etc/firewalld/firewalld.conf regexp="^DefaultZone" line="DefaultZone=drop"
+
+- name: Firewalld - Drop by default
+  firewalld: state=enabled zone=drop permanent=true
+
+- name: Firewalld - Enable passthrough for needed ports
+  firewalld: service="{{ item }}" state=enabled zone=drop permanent=true
+  with_items:
+    - ssh
+    - http
+    - ntp
+    - dns
+    - https
+    - mysql
+    - rsyncd

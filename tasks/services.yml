@@ -1,0 +1,17 @@
+---
+
+# Ensure base services are in proper state
+
+- name: Disable KDump Kernel Crash Analyzer
+  service:
+    name: kdump
+    state: stopped
+    enabled: false
+  ignore_errors: true
+
+- name: Disable Red Hat Network Service (rhnsd)
+  service:
+    name: rhnsd
+    state: stopped
+    enabled: false
+  ignore_errors: true

@@ -1,0 +1,27 @@
+---
+
+# Auditd rules and configuration updates
+
+- name: Auditd - Install default /etc/audit/rules.d/centos7-audit.rules
+  copy: src=centos7-audit.rules
+        dest=/etc/audit/rules.d/centos7-audit.rules
+  when: ansible_distribution == "CentOS"
+
+- name: Auditd - Install default /etc/audit/rules.d/rhel7-audit.rules
+  copy: src=rhel7-audit.rules
+        dest=/etc/audit/rules.d/rhel7-audit.rules
+  when: ansible_distribution == "RedHat"
+
+- name: Auditd - Updates to /etc/audit/auditd.conf
+  lineinfile: dest=/etc/audit/auditd.conf regexp="^{{ item.name }} " line="{{ item.name }} = {{ item.value }}"
+  with_items:
+    - { name: 'space_left_action',       value: 'EMAIL' }
+    - { name: 'admin_space_left_action', value: 'EMAIL' }
+    - { name: 'flush',                   value: 'DATA'  }
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
+
+- name: Auditd - Updates to /etc/audisp/plugins.d/syslog.conf
+  lineinfile: dest=/etc/audisp/plugins.d/syslog.conf regexp="^{{ item.name }} " line="{{ item.name }} = {{ item.value }}"
+  with_items:
+    - { name: 'active',                   value: 'yes'  }
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
